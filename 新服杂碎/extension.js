@@ -6242,9 +6242,9 @@ return mobilesupport;
         translate:{
         },
     },
-    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.05.17",
+    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.05.18",
     author:"苏婆玛丽奥",
     diskURL:"",
     forumURL:"",
-    version:"2.3",
+    version:"2.4",
 },files:{"character":[],"card":[],"skill":[]}}})
