@@ -3026,10 +3026,10 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         player.recover();
     },
                 ai:{
-                    threaten:1.3,
+                    reverseEquip:true,
                     effect:{
                         target:function (card,player,target,current){
-                            if(get.type(card)=='equip') return [1,3];
+                            if(get.type(card)=='equip'&&player==target&&player==_status.currentPhase) return [1,3];
                          },
                     },
                 },
@@ -3078,6 +3078,14 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
     },
             },
             "xinfu_jijun":{
+                ai:{
+                    reverseEquip:true,
+                    effect:{
+                        target:function (card,player,target,current){
+                            if(get.type(card)=='equip'&&player==target&&player==_status.currentPhase&&get.subtype(card)=='equip1') return [1,3];
+                         },
+                    },
+                },
                 audio:"ext:新服杂碎:2",
                 trigger:{
                     player:"useCard",
@@ -3120,7 +3128,9 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
                 dialog.addAuto(content);
                 if(player==game.me||player.isUnderControl()){
                     var list=lib.skill.xinfu_fangtong.getAuto(player);
-                    if(list.length>0) dialog.addText('<li>推荐方案：'+get.translation(list));
+                    if(list.length>0){
+                        dialog.addText('<li>推荐方案：'+get.translation(list));
+                    }
                 }
             }
         },
@@ -3189,7 +3199,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         'step 0'
         var info=['是否发动【方统】？'];
         if(player.storage.xinfu_jijun){
-            info.push('<div class="text center">'+get.translation(player)+'的“集军”牌</div>');
+            info.push('<div class="text center">'+get.translation(player)+'的“方”</div>');
             info.push(player.storage.xinfu_jijun);
         }
         if(player.countCards('h')){
@@ -3256,6 +3266,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         }
         'step 2'
         var target=result.targets[0];
+        player.line(target,'thunder');
         target.damage(3,'thunder');
     },
             },
@@ -4015,12 +4026,14 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
                 frequent:true,
                 filter:function (event,player){
         if(get.type(event.card)=='equip') return false;
-        return !player.countCards('h',{type:'basic',});
+        return event.targets.length>0&&!player.countCards('h',{type:'basic',});
     },
                 content:function (){
         player.draw(trigger.targets.length);
     },
                 ai:{
+                    presha:true,
+                    pretao:true,
                     threaten:1.8,
                 },
             },
@@ -4055,7 +4068,22 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         return player==target;
     },
                 check:function (card){
-        return 0;
+        var player=_status.event.player;
+        if(player.countCards('h','sha')<2){
+        if(player.countCards('h',function(cardx){
+            return cardx.name=='shan'&&get.suit(cardx)=='heart';
+        })>0) return 0;
+        if(player.countCards('h',function(cardx){
+            return cardx.name=='shan'&&get.suit(cardx)=='diamond';
+        })>0) return 0;
+        var damaged=player.maxHp-player.hp-1;
+        if(player.countCards('h',function(cardx){
+            return cardx.name=='tao'&&get.suit(cardx)=='diamond';
+        })>damaged) return 0;
+        }
+        if(card.name=='shan') return 15;
+        if(card.name=='tao') return 10;
+        return 9-get.value(card);
     },
                 content:function (){
         var next=player.useCard({name:'lebu'},target,cards);
@@ -6224,7 +6252,7 @@ return mobilesupport;
     
     
     
-},help:{},config:{"downloadskill":{"name":"<span style='text-decoration: underline'>重新下载技能配音</span>","clear":true},"downloaddie":{"name":"<span style='text-decoration: underline'>重新下载阵亡配音</span>","clear":true},"downloadskin":{"name":"<span style='text-decoration: underline'>重新下载皮肤</span>","clear":true},"caoying":{"name":"曹婴四血化","init":false},"pcdelay":{"name":"评才擦拭停顿","intro":"在发动〖评才〗时使游戏停顿9秒左右，确保配音能够完整播放。","init":true},"characterIntro":{"name":"显示武将称号","init":true},"cheatcode":{"name":"<span style='text-decoration: underline'>神秘代码</span>","clear":true},"checkUpdate":{"name":"检查更新","init":false,"intro":"若开启此选项，在游戏自带的「检查更新」界面中即可对本扩展进行更新。<br><li>关闭此选项即可恢复"}},package:{
+},help:{},config:{"downloadskill":{"name":"<span style='text-decoration: underline'>重新下载技能配音</span>","clear":true},"downloaddie":{"name":"<span style='text-decoration: underline'>重新下载阵亡配音</span>","clear":true},"downloadskin":{"name":"<span style='text-decoration: underline'>重新下载皮肤</span>","clear":true},"caoying":{"name":"曹婴四血化","init":false},"pcdelay":{"name":"评才擦拭停顿","intro":"在发动〖评才〗时使游戏停顿9秒左右，确保配音能够完整播放。","init":true},"characterIntro":{"name":"显示武将称号","init":true},"cheatcode":{"name":"<span style='text-decoration: underline'>神秘代码</span>","clear":true},"checkUpdate":{"name":"检查更新","init":false,"intro":"若开启此选项，在游戏自带的「获取扩展」界面中即可对本扩展进行更新。<br><li>关闭此选项即可恢复"}},package:{
     character:{
         character:{
         },
@@ -6242,9 +6270,9 @@ return mobilesupport;
         translate:{
         },
     },
-    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.05.18",
+    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.05.23",
     author:"苏婆玛丽奥",
     diskURL:"",
     forumURL:"",
-    version:"2.4",
+    version:"2.5",
 },files:{"character":[],"card":[],"skill":[]}}})
