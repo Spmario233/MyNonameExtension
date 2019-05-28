@@ -2095,7 +2095,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
                         silent:true,
                         popup:false,
                         filter:function (event,player){
-                if(event.card.name!='tao') return false;
+                if(!event.card||event.card.name!='tao') return false;
                 if(!event.source||event.source.sex!='male') return false;
                 if(!player.isDying()) return false;
                 if(game.hasPlayer(function(current){
@@ -6270,9 +6270,9 @@ return mobilesupport;
         translate:{
         },
     },
-    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.05.23",
+    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.05.28",
     author:"苏婆玛丽奥",
     diskURL:"",
     forumURL:"",
-    version:"2.5",
+    version:"2.6",
 },files:{"character":[],"card":[],"skill":[]}}})
