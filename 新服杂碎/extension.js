@@ -37,6 +37,8 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
             zhoufang:"下发载义",
             majun:"没渊瑰璞",
             xf_yiji:"礼仁同渡",
+            simazhao:"四海威服",
+            wangyuanji:"清雅抑华",
         };
         for(var i in CT){
             lib.characterTitle[i]=CT[i];
@@ -1336,14 +1338,14 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
                 },
                 filter:function (event,player){
         return !game.hasPlayer(function(current){
-            return current!=player&&current.countCards('h')==0;
+            return current.countCards('h')==0;
         });
     },
                 forced:true,
                 content:function (){
         event.num=0;
         var list=game.filterPlayer(function(target){
-            if(target.isMinHandcard()&&target!=player) event.num=target.countCards('h');
+            if(target.isMinHandcard()) event.num=target.countCards('h');
             return player!=target;
         });
         if(event.num<1){
@@ -4569,11 +4571,14 @@ game.import('character',function(){
             zhaotongzhaoguang:["male","shu",4,["yizan_use","xinfu_longyuan"],["des:赵统，赵云长子，生卒年不详。常山真定（今为河北正定）人，陈寿在正史《三国志》中记载赵云去世后，赵统袭爵永昌亭侯，官至蜀汉虎贲中郎督，加行领军。赵广（？—263年），三国时期蜀汉牙门将，赵云的次子，赵统之弟。随姜维前往沓中，官拜牙门将。曹魏司马氏派五路大军伐蜀时，随大将军姜维与魏兵战于疆川口，姜维败绩还守剑阁，赵广于沓中战死。"]],
             majun:["male","wei",3,["xinfu_jingxie1","xinfu_qiaosi"],["des:马钧，字德衡，扶风（今陕西扶风）人，生活在汉朝末期，是中国古代科技史上最负盛名的机械发明家之一。马钧年幼时家境贫寒，自己又有口吃的毛病，所以不擅言谈却精于巧思，后来在魏国担任给事中的官职。马钧最突出的表现有还原指南车；改进当时操作笨重的织绫机；发明一种由低处向高地引水的龙骨水车；制作出一种轮转式发石机，能连续发射石块，远至数百步；把木制原动轮装于木偶下面，叫做“水转百戏”。此后，马钧还改制了诸葛连弩，对科学发展和技术进步做出了贡献。"]],
             "xf_yiji":["male","shu",3,["xinfu_jijie","xinfu_jiyuan"],["des:伊籍，字机伯，生卒年不详，兖州山阳郡（今山东金乡县）人，三国时期蜀汉官员。年少时依附于同乡刘表。刘备落难到荆州时，伊籍时常拜访，托请刘备照顾。建安十三年（208年），刘表病死，伊籍便转投刘备，一起渡江南下。建安十六年（211年），刘备入蜀帮助刘璋，伊籍亦有跟随。随后刘备和刘璋双方决裂。建安十九年（214年），刘备平定益州，任命伊籍为左将军从事中郎，其待遇次于简雍、孙乾等。后升任昭文将军，并与诸葛亮、法正、刘巴、李严共同编制《蜀科》。"]],
+            simazhao:["male","wei",3,["xinfu_daigong","xinfu_zhaoxin"],["des:司马昭（211年—265年9月6日），字子上（小说《三国演义》为子尚），河内温县（今属河南）人。三国时期曹魏权臣，西晋王朝的奠基人之一。为晋宣帝司马懿与宣穆皇后张春华次子、晋景帝司马师之弟、晋武帝司马炎之父。 司马昭早年随父抗击蜀汉，多有战功。累官洛阳典农中郎将，封新城乡侯。正元二年（255年），继兄司马师为大将军，专揽国政。甘露五年（260年），魏帝曹髦被弑杀，司马昭立曹奂为帝。景元四年（263年），分兵遣钟会、邓艾、诸葛绪三路灭亡蜀汉，受封晋公。次年，进爵晋王。 咸熙二年（265年），司马昭病逝，年五十四，葬于崇阳陵。数月后，其子司马炎代魏称帝，建立晋朝，追尊司马昭为文帝，庙号太祖。"]],
+            wangyuanji:["female","wei",3,["xinfu_qianchong","xinfu_shangjian"],["des:王元姬（217年—268年4月20日），东海郯县（今山东郯城西北）人。三国时期曹魏经学家王朗之孙女、王肃之女，晋文帝司马昭妻子，晋武帝司马炎与齐王司马攸的生母。 王元姬幼时便通《诗经》、《论语》，嫁司马昭后竭尽妇道、谦虚谨慎。其人颇有远见，曾预言钟会谋反之事。泰始元年（265年），司马炎建立西晋，尊王元姬为皇太后，宫号曰崇化宫。王元姬身处太后之位，提倡节俭，身体力行，作为众妃子的表率。在其治理之下，后宫井井有条，众人和睦相处。 泰始四年（268年），王元姬崩逝，终年五十二岁。谥号文明皇后，与司马昭合葬于崇阳陵。"]],
             },
   	    	characterIntro:{
          		},
          		perfectPair:{
          		    zhaotongzhaoguang:['zhaoyun','mayunlu'],
+         		    simazhao:['wangyuanji'],
          		},
             skill:{
             "xinfu_pingcai":{
@@ -5301,6 +5306,283 @@ game.import('character',function(){
         trigger.player.draw();
     },
             },
+            "xinfu_daigong":{
+                trigger:{
+                    player:"damageBegin",
+                },
+                filter:function (event,player){
+        return event.source!=undefined&&player.countCards('h')>0;
+    },
+                content:function (){
+        'step 0'
+        player.showHandcards();
+        'step 1'
+        var cards=player.getCards('h');
+        var suits=[];
+        for(var i=0;i<cards.length;i++){
+            suits.add(get.suit(cards[i]));
+        }
+        trigger.source.chooseCard('he','交给'+get.translation(player)+'一张满足条件的牌，否则防止此伤害。',function(card){
+            return !suits.contains(get.suit(card));
+        }).ai=function(card){
+            var player=_status.event.player;
+            var target=_status.event.getParent('xinfu_daigong').player;
+            if(get.damageEffect(target,player,player)>0) return 6.5-get.value(card);
+            return 0;
+        };
+        'step 2'
+        if(result.bool){
+            trigger.source.give(result.cards,player,true);
+        }
+        else trigger.cancel();
+    },
+            },
+            "xinfu_zhaoxin":{
+                group:["zhaoxin_give"],
+                intro:{
+                    content:"cards",
+                },
+                enable:"phaseUse",
+                usable:1,
+                init:function (player,skill){
+        if(!player.storage[skill]) player.storage[skill]=[];
+    },
+                filter:function (event,player){
+        return player.storage.xinfu_zhaoxin.length<3&&player.countCards('h')>0;
+    },
+                filterCard:true,
+                selectCard:function (){
+        var player=_status.event.player;
+        return [1,3-player.storage.xinfu_zhaoxin.length];
+    },
+                discard:false,
+                content:function (){
+        'step 0'
+        player.$give(cards,player);
+        player.storage.xinfu_zhaoxin=player.storage.xinfu_zhaoxin.concat(cards);
+        player.markSkill('xinfu_zhaoxin');
+        'step 1'
+        player.draw(cards.length);
+    },
+                check:function (card){
+        return 6-get.value(card);
+    },
+                ai:{
+                    order:1,
+                    result:{
+                        player:1,
+                    },
+                },
+            },
+            "zhaoxin_give":{
+                trigger:{
+                    global:"phaseDrawAfter",
+                },
+                filter:function (event,player){
+        if(!player.storage.xinfu_zhaoxin.length) return false;
+        if(event.player==player) return false;
+        return get.distance(player,event.player,'attack')<=1
+    },
+                direct:true,
+                content:function (){
+        'step 0'
+        player.chooseCardButton(get.prompt('xinfu_zhaoxin',trigger.player),player.storage.xinfu_zhaoxin,function(button){
+            return true;
+        }).set('ai',function(button){
+            var player=_status.event.player;
+            if(get.attitude(player,_status.currentPhase)>0) return get.value(button.link);
+            return 6-get.value(button.link);
+        });
+        'step 1'
+        if(result.bool){
+            event.card=result.links[0];
+            player.logSkill('xinfu_zhaoxin',target);
+            player.line(trigger.player,'thunder');
+            player.showCards(event.card);
+        }
+        else event.finish();
+        'step 2'
+        trigger.player.chooseBool('是否获得'+get.translation(event.card)+'?').ai=function(){
+            return get.attitude(trigger.player,player)>0;
+        };
+        'step 3'
+        if(result.bool){
+            player.storage.xinfu_zhaoxin.remove(event.card);
+            player.give(event.card,trigger.player,true);
+            if(player.storage.xinfu_zhaoxin.length) player.markSkill('xinfu_zhaoxin');
+            else player.unmarkSkill('xinfu_zhaoxin');
+            player.chooseBool('是否对'+get.translation(trigger.player)+'造成一点伤害？').ai=function(){
+                return get.damageEffect(trigger.player,player,player)>0
+            };
+        }
+        else{
+            trigger.player.chat('拒绝');
+            event.finish();
+        }
+        'step 4'
+        if(result.bool){
+            trigger.player.damage();
+        }
+    },
+            },
+            "xinfu_qianchong":{
+                mod:{
+                    targetInRange:function (card,player,target){
+            if(player.storage.xinfu_qianchong.contains(get.type(card,'trick'))){
+                return true;
+            }
+        },
+                    cardUsable:function (card,player,num){
+            if(player.storage.xinfu_qianchong.contains(get.type(card,'trick'))) return Infinity;
+        },
+                },
+                group:["xinfu_qianchong_clear","qc_weimu","qc_mingzhe"],
+                subSkill:{
+                    clear:{
+                        sub:true,
+                        forced:true,
+                        silent:true,
+                        popup:false,
+                        trigger:{
+                            player:"phaseAfter",
+                        },
+                        content:function (){
+                player.storage.xinfu_qianchong=[];
+            },
+                    },
+                },
+                init:function (event,player){
+        event.storage[player]=[];
+    },
+                trigger:{
+                    player:"phaseUseBegin",
+                },
+                locked:false,
+                direct:true,
+                filter:function (event,player){
+        var es=player.getCards('e');
+        if(!es.length) return true;
+        var col=get.color(es[0]);
+        for(var i=0;i<es.length;i++){
+            if(get.color(es[i])!=col) return true;
+        }
+        return false;
+    },
+                content:function (){
+        'step 0'
+        var list=['basic','trick','equip','cancel2'];
+        for(var i=0;i<player.storage.xinfu_qianchong.length;i++){
+            list.remove(player.storage.xinfu_qianchong[i]);
+        }
+        if(list.length>1){
+        player.chooseControl(list).set('ai',function(){
+                return list[0];
+            }
+).set('prompt',get.prompt('xinfu_qianchong')).set('prompt2',get.translation('xinfu_qianchong_info'));
+        }
+        else event.finish();
+        'step 1'
+        if(result.control&&result.control!='cancel2'){
+            player.logSkill('xinfu_qianchong');
+            player.storage.xinfu_qianchong.add(result.control);
+            var str=get.translation(result.control)+'牌';
+            game.log(player,'声明了','#y'+str);
+            player.popup(str,'thunder');
+        }
+    },
+            },
+            "qc_weimu":{
+                mod:{
+                    targetEnabled:function (card,player,target){
+            var bool=true;
+            var es=target.getCards('e');
+            if(!es.length) bool=false;
+            for(var i=0;i<es.length;i++){
+                if(get.color(es[i])!='black') bool=false;
+            }
+            if(bool&&(get.type(card)=='trick'||get.type(card)=='delay')&&
+                get.color(card)=='black') return false;
+        },
+                },
+            },
+            "qc_mingzhe":{
+                audio:"ext:新服杂碎:2",
+                trigger:{
+                    player:["useCardAfter","respondAfter","discardAfter"],
+                },
+                frequent:true,
+                filter:function (event,player){
+        if(player.hasSkill('mingzhe')) return false;
+        if(player==_status.currentPhase) return false;
+        var es=player.getCards('e');
+        if(!es.length) return false;
+        for(var i=0;i<es.length;i++){
+            if(get.color(es[i])!='red') return false;
+        }
+        if(event.cards){
+            for(var i=0;i<event.cards.length;i++){
+                if(get.color(event.cards[i])=='red'&&
+                event.cards[i].original!='j') return true;
+            }
+        }
+        return false;
+    },
+                content:function (){
+        player.draw();
+    },
+                ai:{
+                    threaten:0.7,
+                },
+            },
+            "xinfu_shangjian":{
+                group:["xinfu_shangjian_count","xinfu_shangjian_init"],
+                trigger:{
+                    global:"phaseEnd",
+                },
+                filter:function (event,player){
+        return player.storage.xinfu_shangjian<=player.hp&&player.storage.xinfu_shangjian>0;
+    },
+                frequent:true,
+                content:function (){
+        'step 0'
+        var num=player.storage.xinfu_shangjian;
+        if(num>0){
+            player.draw(num);
+        }
+    },
+                subSkill:{
+                    init:{
+                        trigger:{
+                            global:"phaseBefore",
+                        },
+                        filter:function (event,player){
+                return true;
+            },
+                        silent:true,
+                        content:function (){
+                player.storage.xinfu_shangjian=0;
+            },
+                        sub:true,
+                        forced:true,
+                        popup:false,
+                    },
+                    count:{
+                        trigger:{
+                            player:"loseEnd",
+                        },
+                        silent:true,
+                        filter:function (event,player){
+                return true;
+            },
+                        content:function (){
+                player.storage.xinfu_shangjian+=trigger.cards.length;
+            },
+                        sub:true,
+                        forced:true,
+                        popup:false,
+                    },
+                },
+            },
             },
             translate:{
             pangdegong:"庞德公",
@@ -5339,6 +5621,22 @@ game.import('character',function(){
             "xinfu_jijie_info":"出牌阶段限一次。你可以观看牌堆底的一张牌，然后将其交给一名角色。",
             "xinfu_jiyuan":"急援",
             "xinfu_jiyuan_info":"当一名角色进入濒死状态时，或者你交给一名其他角色牌时，你可以令其摸一张牌。",
+            simazhao:"司马昭",
+            wangyuanji:"王元姬",
+            "xinfu_daigong":"怠攻",
+            "xinfu_daigong_info":"当你受到伤害时，你可以展示所有手牌，然后令伤害来源选择一项：交给你一张与你所有手牌花色均不相同的一张牌，或防止此伤害。",
+            "xinfu_zhaoxin":"昭心",
+            "xinfu_zhaoxin_info":"出牌阶段限一次，你可以将任意张手牌置于武将牌上，称之为「望」（你至多拥有三张「望」）。一名其他角色的摸牌阶段结束后，其可以获得一张由你选择的「望」，然后你可以对其造成1点伤害。",
+            "zhaoxin_give":"昭心",
+            "zhaoxin_give_info":"",
+            "xinfu_qianchong":"谦冲",
+            "xinfu_qianchong_info":"锁定技，若你的装备区内有牌且：均为红色，则你视为拥有技能〖明哲〗。均为黑色，则你视为拥有技能〖帷幕〗。若均不满足，则出牌阶段开始时，你可以选择一种类别的牌，然后你本回合内使用该类别的牌时没有次数和距离限制。",
+            "qc_weimu":"帷幕",
+            "qc_weimu_info":"",
+            "qc_mingzhe":"明哲",
+            "qc_mingzhe_info":"",
+            "xinfu_shangjian":"尚俭",
+            "xinfu_shangjian_info":"一名角色的结束阶段开始时，若你于此阶段失去了x张或更少的牌，则你可以摸等量的牌。（x为你的体力值）。",
             },
             card:{
             },
@@ -6270,9 +6568,9 @@ return mobilesupport;
         translate:{
         },
     },
-    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.05.28",
+    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.05.30",
     author:"苏婆玛丽奥",
     diskURL:"",
     forumURL:"",
-    version:"2.6",
-},files:{"character":[],"card":[],"skill":[]}}})
+    version:"2.7",
+},files:{"character":["wangyuanji.jpg"],"card":[],"skill":[]}}})
