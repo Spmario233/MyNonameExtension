@@ -39,6 +39,9 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
             xf_yiji:"礼仁同渡",
             simazhao:"四海威服",
             wangyuanji:"清雅抑华",
+            xf_huangquan:"道绝殊途",
+            xf_sufei:"与子同袍",
+            xf_tangzi:"工学之奇才",
         };
         for(var i in CT){
             lib.characterTitle[i]=CT[i];
@@ -262,6 +265,9 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
             lvkai:["male","shu",3,["xinfu_tunan","xinfu_bijing"],["des:吕凯（？―225年），字季平，永昌郡不韦县（今云南保山东北）人，三国时期蜀汉官员。初任永昌郡五官掾功曹。章武三年（223年），建宁太守雍闿反叛，投降吴国，吴国任雍闿为永昌太守，吕凯闭境抗拒雍闿。建兴三年（225年），丞相诸葛亮南征，表奏吕凯功劳，任命他为云南太守，封阳迁亭侯。吕凯还未上任，便被叛乱的少数民族杀害。"]],
             zhanggong:["male","wei",3,["xinfu_zhenxing","xinfu_qianxin"],["des:张恭（生卒年不详），三国时期魏国大臣，与子张就一同闻名于西域。官至西域戊己校尉、关内侯，赠执金吾。初为敦煌郡功曹。东汉末河西大乱，太守马艾卒官，他被众人推为代理长史，遂派儿子张就请曹操委任太守，直至新太守到任。魏文帝时拜西域戊己校尉。魏明帝时去世。"]],
             weiwenzhugezhi:["male","wu",4,["xinfu_fuhai"],["des:卫温 （？—231年），三国时期东吴将领，曾任将军职。诸葛直（？—231年），三国时期东吴将领。黄龙二年（230年）正月，孙权派卫温、诸葛直带领上万士兵出海寻找夷洲、亶洲，想要俘获那里的民众以充实东吴的人口，陆逊和全琮都谏言反对，孙权不听。230年和卫温一起登上台湾（当时的台湾叫做夷洲），他们是中国历史上记载的最早登陆台湾的人。卫温和诸葛直花费了约一年时间行军，士兵们因为疾病死去了十分之八到十分之九，因为亶洲太过遥远，卫温和诸葛直最终没能到达那里，只带了几千名夷洲的人返回。黄龙三年（231年），孙权认为诸葛直违背诏令，劳财伤民，无功而返，和卫温一同入狱被处死。"]],
+            "xf_tangzi":["male","wei",4,["xinfu_xingzhao"],["des:唐咨（生卒年不详），三国时魏利城（今江苏赣榆西）人。魏文帝黄初中利城郡反，推唐咨为主。后为魏军击破，遂亡至吴，官至左将军，封侯、持节。后助诸葛诞拒魏，兵败被俘。为安抚吴国军民，魏主拜唐咨为安远将军。"]],
+            "xf_huangquan":["male","shu",3,["xinfu_dianhu","xinfu_jianji"],["des:黄权（？－240年），字公衡。巴西郡阆中县（今四川阆中）人。三国时期蜀汉、曹魏将领。<br>黄权年轻时为郡吏，后被益州牧刘璋召为主簿。曾劝谏刘璋不要迎接刘备，因而被外放为广汉县长。刘璋败，才降刘备，被拜为偏将军。建计取汉中，拜护军。刘备为汉中王，仍领益州牧，以黄权为治中从事。及刘备称帝，将伐吴，黄权劝谏而不纳。以其为镇北将军，督江北军以防魏师进攻。刘备伐吴败还，而归途隔绝，黄权不得归，无奈之下率部降魏。被魏文帝所赏识，拜镇南将军，封育阳侯，加侍中，使同车陪乘。后领益州刺史，进驻河南。景初三年（239年），迁车骑将军、仪同三司。正始元年（240年），黄权去世，谥号“景”。"]],
+            "xf_sufei":["male","wu",4,["xinfu_lianpian"],["des:苏飞（生卒年不详），东汉末年人物，原为东汉末年荆州牧刘表的部将，任江夏都督。<br>苏飞与甘宁交好，但是数次向黄祖推荐都失败。甘宁决定投效孙权时助其逃离。后来甘宁率吴军攻破江夏，苏飞兵败被俘。孙权打算将苏飞处斩，但是因为甘宁用性命担保而赦免了苏飞。降吴后官至军都督。"]],
             },
   	    	characterIntro:{
     		},
@@ -271,6 +277,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
     		perfectPair:{
     		    lijue:['guosi','jiaxu'],
     		    zhangji:['zhangxiu','drlt_zhangxiu','zoushi'],
+    		    xf_sufei:['ganning'],
     		},
             skill:{
             "xinfu_langxi":{
@@ -1092,6 +1099,241 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         delete player.storage.xinfu_fuhai;
     },
             },
+            "xz_xunxun":{
+                filter:function (event,player){
+        var num=game.countPlayer(function(current){
+            return current.isDamaged();
+        });
+        return num>=1&&!player.hasSkill('xunxun');
+    },
+                audio:"ext:新服杂碎:2",
+                trigger:{
+                    player:"phaseDrawBefore",
+                },
+                priority:10,
+                content:function (){
+        "step 0"
+        event.cards=get.cards(4);
+        player.chooseCardButton(event.cards,2,'选择两张牌置于牌堆顶').set('ai',ai.get.buttonValue);
+        "step 1"
+        if(result.bool){
+            var choice=[];
+            for(var i=0;i<result.links.length;i++){
+                choice.push(result.links[i]);
+                cards.remove(result.links[i]);
+            }
+            for(var i=0;i<cards.length;i++){
+                ui.cardPile.appendChild(cards[i]);
+            }
+            while(choice.length){
+                ui.cardPile.insertBefore(choice.pop(),ui.cardPile.firstChild);
+            }
+        }
+    },
+            },
+            "xinfu_xingzhao":{
+                inherit:"xingzhao2",
+                group:["xz_xunxun","xinfu_xingzhao2"],
+                mark:true,
+                intro:{
+                    content:function (storage,player){
+            var num=game.countPlayer(function(current){
+                return current.isDamaged();
+            })
+            var str='暂无任何效果';
+            if(num>=1){
+                str='<li>视为拥有技能“恂恂”';
+            }
+            if(num>=2){
+                str+='；使用装备牌时摸一张牌';
+            }
+            if(num>=3){
+                str+='；始终跳过弃牌阶段';
+            }
+            return str;
+        },
+                },
+                trigger:{
+                    player:"useCard",
+                },
+                forced:true,
+                filter:function (event,player){
+        if(get.type(event.card)!='equip') return false;
+        var num=game.countPlayer(function(current){
+                return current.isDamaged();
+            });
+        return num>=2;
+    },
+                content:function (){
+        player.draw();
+    },
+            },
+            "xinfu_xingzhao2":{
+                trigger:{
+                    player:"phaseDiscardBefore",
+                },
+                forced:true,
+                filter:function (event,player){
+        var num=game.countPlayer(function(current){
+                return current.isDamaged();
+            });
+        return num>=3;
+    },
+                content:function (){
+        trigger.cancel();
+        game.log(player,'跳过了弃牌阶段');
+    },
+            },
+            "xinfu_dianhu":{
+                trigger:{
+                    global:"gameDrawAfter",
+                },
+                forced:true,
+                filter:function (){
+        return game.players.length>1;
+    },
+                content:function (){
+        'step 0'
+        player.chooseTarget('选择【点虎】的目标',lib.translate.xinfu_dianhu_info,true,function(card,player,target){
+            return target!=player&&!target.hasSkill('xinfu_dianhu2');
+        }).set('ai',function(target){
+            var att=get.attitude(_status.event.player,target);
+            if(att<0) return -att+3;
+            return Math.random();
+        });
+        'step 1'
+        if(result.bool){
+            var target=result.targets[0];
+            player.line(target,'green');
+            game.log(target,'成为了','【点虎】','的目标');
+            target.storage.xinfu_dianhu2=player;
+            target.addSkill('xinfu_dianhu2');
+        }
+    },
+            },
+            "xinfu_dianhu2":{
+                mark:"character",
+                intro:{
+                    content:"当你受到来自$的伤害或回复体力后，$摸一张牌",
+                },
+                nopop:true,
+                trigger:{
+                    player:["damageAfter","recoverAfter"],
+                },
+                forced:true,
+                popup:false,
+                filter:function (event,player){
+        if(player.storage.xinfu_dianhu2&&player.storage.xinfu_dianhu2.isIn()){
+            if(event.name=='damage') return event.source==player.storage.xinfu_dianhu2;
+            return true;
+        };
+    },
+                content:function (){
+        'step 0'
+        var target=player.storage.xinfu_dianhu2;
+        target.logSkill('xinfu_dianhu');
+        target.draw();
+    },
+                onremove:true,
+            },
+            "xinfu_jianji":{
+                audio:"ext:新服杂碎:2",
+                enable:"phaseUse",
+                usable:1,
+                filterTarget:function (card,player,target){
+        return target!=player;
+    },
+                content:function (){
+        'step 0'
+        target.draw();
+        'step 1'
+        var card=result[0];
+        if(card&&game.hasPlayer(function(current){
+            return target.canUse(card,current);
+        })&&get.owner(card)==target){
+            target.chooseToUse({
+                prompt:'是否使用'+get.translation(card)+'？',
+                filterCard:function(cardx,player,target){
+                    return cardx==card;
+                },
+            });
+        }
+    },
+                ai:{
+                    order:7.5,
+                    result:{
+                        target:1,
+                    },
+                },
+            },
+            "xinfu_lianpian":{
+                audio:2,
+                subSkill:{
+                    refrain:{
+                        forced:true,
+                        silent:true,
+                        popup:false,
+                        trigger:{
+                            global:["phaseBefore","phaseAfter"],
+                        },
+                        content:function (){
+                player.storage.xinfu_lianpian=[];
+                player.storage.xinfu_lianpian_number=0;
+            },
+                    },
+                },
+                group:["xinfu_lianpian_refrain"],
+                trigger:{
+                    player:"useCard",
+                },
+                forced:true,
+                popup:false,
+                filter:function (event,player){
+        return _status.currentPhase==player&&player.storage.xinfu_lianpian_number<3;
+    },
+                content:function (){
+        'step 0'
+        if(!player.storage.xinfu_lianpian){
+            event.goto(4);
+        }
+        else{
+            event.ablers=[];
+            for(var i=0;i<trigger.targets.length;i++){
+                if(player.storage.xinfu_lianpian.contains(trigger.targets[i])){
+                    event.ablers.add(trigger.targets[i]);
+                }
+            }
+            if(!event.ablers.length) event.goto(4);
+            else{
+                player.chooseBool(get.prompt('xinfu_lianpian')).set('ai',function(){
+                    return true;
+                }).set('prompt2',get.translation('xinfu_lianpian_info'));
+            }
+        }
+        'step 1'
+        if(result.bool){
+            player.logSkill('xinfu_lianpian');
+            player.storage.xinfu_lianpian_number++;
+            player.draw();
+        }
+        else event.goto(4);
+        'step 2'
+        event.card=result[0];
+        if(event.card&&get.owner(event.card)==player&&(event.ablers.length>1||event.ablers[0]!=player)){
+            player.chooseTarget('是否将'+get.translation(event.card)+'交给其他角色？',function(card,player,target){
+               return event.ablers.contains(target)&&target!=player;
+            }).ai=function(){
+                return false;
+            };
+        }
+        'step 3'
+        if(result.bool){
+            player.give(event.card,result.targets[0],true);
+        }
+        'step 4'
+        player.storage.xinfu_lianpian=trigger.targets;
+    },
+            },
             },
             translate:{
             "xinfu_langxi":"狼袭",
@@ -1135,6 +1377,23 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
             "xinfu_fuhai_info":"出牌阶段对每名角色限一次，你可以展示一张手牌并选择上家或下家。该角色展示一张手牌，若你的牌点数大于等于他的牌点数，你弃置你展示的牌，然后继续对其上家或下家重复此流程；你的牌点数小于该角色牌的点数，则该角色弃置其展示的牌，然后你与其各摸X张牌（X为你此回合内发动此技能选择的角色数），且你此阶段内不能再发动“浮海”。",
             "fuhai_clear":"浮海",
             "fuhai_clear_info":"",
+            "xf_tangzi":"唐咨",
+            "xf_huangquan":"黄权",
+            "xf_sufei":"苏飞",
+            "xz_xunxun":"恂恂",
+            "xz_xunxun_info":"摸牌阶段，你可以观看牌堆顶的四张牌，然后将其中的两张牌置于牌堆顶，并将其余的牌以任意顺序置于牌堆底。",
+            "xinfu_xingzhao":"兴棹",
+            "xinfu_xingzhao_info":"锁定技，若场上的已受伤角色合计为：1个以上，你视为拥有技能〖恂恂〗；2个以上，当你使用装备牌时，摸一张牌；3个以上，你跳过弃牌阶段。",
+            "xinfu_xingzhao2":"兴棹",
+            "xinfu_xingzhao2_info":"",
+            "xinfu_dianhu":"点虎",
+            "xinfu_dianhu_info":"锁定技，游戏开始时，你选择一名其他角色。当其受到来自你的伤害后或回复体力后，你摸一张牌。",
+            "xinfu_dianhu2":"点虎",
+            "xinfu_dianhu2_info":"",
+            "xinfu_jianji":"谏计",
+            "xinfu_jianji_info":"出牌阶段限一次，你可以令一名其他角色摸一张牌。然后，该角色可以使用此牌。",
+            "xinfu_lianpian":"联翩",
+            "xinfu_lianpian_info":"出牌阶段限三次。当你对一名角色连续使用牌时，你可以摸一张牌，然后可以将一张牌交给该角色。",
             },
         };
         if(lib.device||lib.node){
@@ -5307,6 +5566,7 @@ game.import('character',function(){
     },
             },
             "xinfu_daigong":{
+                usable:1,
                 trigger:{
                     player:"damageBegin",
                 },
@@ -5624,7 +5884,7 @@ game.import('character',function(){
             simazhao:"司马昭",
             wangyuanji:"王元姬",
             "xinfu_daigong":"怠攻",
-            "xinfu_daigong_info":"当你受到伤害时，你可以展示所有手牌，然后令伤害来源选择一项：交给你一张与你所有手牌花色均不相同的一张牌，或防止此伤害。",
+            "xinfu_daigong_info":"每回合限一次。当你受到伤害时，你可以展示所有手牌，然后令伤害来源选择一项：交给你一张与你所有手牌花色均不相同的一张牌，或防止此伤害。",
             "xinfu_zhaoxin":"昭心",
             "xinfu_zhaoxin_info":"出牌阶段限一次，你可以将任意张手牌置于武将牌上，称之为「望」（你至多拥有三张「望」）。一名其他角色的摸牌阶段结束后，其可以获得一张由你选择的「望」，然后你可以对其造成1点伤害。",
             "zhaoxin_give":"昭心",
@@ -6568,9 +6828,15 @@ return mobilesupport;
         translate:{
         },
     },
-    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.05.30",
+    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.06.01",
     author:"苏婆玛丽奥",
     diskURL:"",
     forumURL:"",
-    version:"2.7",
-},files:{"character":["wangyuanji.jpg"],"card":[],"skill":[]}}})
+    version:"2.8",
+},files:{"character":["xf_yiji.jpg","majun.jpg","lvqian.jpg","zhangji.jpg","zhanggong.jpg",
+		"panjun.jpg","liuyan.jpg","weiwenzhugezhi.jpg","yanjun.jpg","wangcan.jpg","zhoufang.jpg",
+		"wolong_card.jpg","baosanniang.jpg","fengchu_card.jpg","re_yuji.jpg","zhaotongzhaoguang.jpg",
+		"sp_taishici.jpg","xuanjian_card.jpg","liuyao.jpg","pangdegong.jpg","re_jsp_pangtong.jpg",
+		"re_zhangliang.jpg","lvdai.jpg","caoying.jpg","duji.jpg","zhangqiying.jpg","fanchou.jpg",
+		"lvkai.jpg","guosi.jpg","lijue.jpg","xurong.jpg","simahui.jpg","shuijing_card.jpg",
+		"simazhao.jpg","wangyuanji.jpg","xf_huangquan.jpg","xf_tangzi.jpg","xf_sufei.jpg"],"card":[],"skill":[]}}})
