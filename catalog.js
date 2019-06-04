@@ -14,3 +14,12 @@ extension["新服杂碎"]={
 		"xf_tangzi.jpg","xf_sufei.jpg"],
 	size:"6.76MB"
 };
+extension["新国战"]={
+	intro:"◇2019版新国战规则与武将改动扩展",
+	author:"苏婆玛丽奥",
+	netdisk:"",
+	forum:"",
+	version:"3.4",
+	files:["extension.js","chaoming.mp3","default.mp3","package.js"],
+	size:"5MB"
+};
