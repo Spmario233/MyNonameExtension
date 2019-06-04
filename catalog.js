@@ -20,6 +20,6 @@ extension["新国战"]={
 	netdisk:"",
 	forum:"",
 	version:"3.4",
-	files:["extension.js","chaoming.mp3","default.mp3","package.js"],
+	files:["extension.js","chaoming.mp3","default.mp3"],
 	size:"5MB"
 };
