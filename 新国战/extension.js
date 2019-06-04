@@ -1,5 +1,340 @@
 game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新国战",content:function (config,pack){
     if(lib.characterPack.mode_guozhan){
+        //新版卡牌
+        if(config.newcard==true){
+    //飞龙夺凤
+    lib.translate.feilongduofeng_info='当你使用【杀】指定一名角色为目标后，你可令该角色弃置一张牌。当你使用【杀】令其他角色进入濒死状态时，你可以获得其一张手牌。';
+    lib.skill.feilongduofeng2={
+        trigger:{source:'dying'},
+        filter:function(event,player){
+            var evt=event.getParent('damage');
+            return evt&&evt.card&&evt.card.name=='sha'&&event.player.countGainableCards(player,'h')>0;
+        },
+        priority:7,
+        check:function(event,player){
+            return get.attitude(player,event.player)<0;
+        },
+        content:function(){
+            player.gainPlayerCard(trigger.player,true);
+        },
+    }
+    //太平要术
+    lib.translate.taipingyaoshu_info='锁定技，防止你受到的所有属性伤害；全场每有一名与你势力相同的角色存活，你的手牌上限便+1；当你失去装备区里的【太平要术】时，你摸两张牌，然后若你的体力大于1，你失去1点体力。';
+    lib.card.taipingyaoshu={
+				mode:['guozhan'],
+				fullskin:true,
+				type:'equip',
+				subtype:'equip2',
+				nomod:true,
+				nopower:true,
+				unique:true,
+				global:['g_taipingyaoshu_ai'],
+				skills:['taipingyaoshu'],
+				ai:{
+					equipValue:function(card,player){
+						if(player.hasSkill('wendao')) return 9;
+						if(game.hasPlayer(function(current){
+							return current.hasSkill('wendao')&&get.attitude(player,current)<=0;
+						})){
+							return 1;
+						}
+						return 6;
+					},
+					basic:{
+						equipValue:6
+					}
+				},
+				onLose:function(){
+					'step 0'
+					player.draw(2);
+					'step 1'
+					if(player.hp>1) player.loseHp();
+				}
+			};
+			lib.skill.taipingyaoshu={
+		 mod:{
+					maxHandcard:function(player,num){
+							if(player.hasSkill('huangjintianbingfu')){
+								num+=player.storage.huangjintianbingfu.length;
+							}
+							return num+game.countPlayer(function(current){
+								return current.isFriendOf(player);
+							});
+					}
+				},
+				trigger:{player:'damageBefore'},
+				filter:function(event,player){
+					if(event.source&&event.source.hasSkillTag('unequip',false,{
+						name:event.card?event.card.name:null,
+						target:player,
+						card:event.card
+					})) return false;
+					if(event.nature) return true;
+				},
+				forced:true,
+				content:function(){
+					trigger.cancel();
+				},
+				ai:{
+					nofire:true,
+					nothunder:true,
+					effect:{
+						target:function(card,player,target,current){
+							if(player.hasSkillTag('unequip',false,{
+								name:card?card.name:null,
+								target:player,
+								card:card
+							})) return;
+							if(get.tag(card,'natureDamage')) return 'zerotarget';
+							if(card.name=='tiesuo'){
+								return [0,0];
+							}
+						}
+					}
+				}
+			};
+			lib.skill.g_taipingyaoshu={};
+    //联军盛宴
+    lib.translate.lianjunshengyan_info='出牌阶段，对你和你选择的除你的势力外的一个势力的所有角色。若目标角色：为你，你摸X张牌或回复X点体力（X为该势力的角色数）；不为你，其摸一张牌，然后重置';
+    lib.card.lianjunshengyan={
+				fullskin:true,
+				type:'trick',
+				enable:function(card,player){
+					return !player.isUnseen();
+				},
+				mode:['guozhan'],
+				filterTarget:function(card,player,target){
+					return target.identity!='unknown'&&(target.identity!=player.identity||target.identity=='ye');
+				},
+				changeTarget:function(player,targets){
+					var target=targets[0];
+					targets.push(player);
+					if(target.identity!='ye'){
+						game.filterPlayer(function(current){
+							return target!=current&&target.identity==current.identity&&!current.hasSkill('diaohulishan');
+						},targets);
+					}
+				},
+				content:function(){
+					'step 0'
+					if(target==player){
+                        var num=targets.length-1;
+						target.chooseDrawRecover(num,num,true);
+						event.finish();
+					}
+					else{
+						target.draw();
+					}
+					'step 1'
+					target.link(false);
+				},
+				ai:{
+					order:3,
+					value:4,
+					useful:2,
+					result:{
+						player:1.3,
+						target:1,
+					},
+				},
+			}
+			//挟天子以令诸侯
+			lib.translate.xietianzi_info='出牌阶段，对自己使用。你结束出牌阶段，若如此做，弃牌阶段结束时，你可以弃置一张手牌，获得一个额外的回合';
+			lib.translate.xietianzi_info_guozhan='出牌阶段，对为大势力角色的你使用。你结束出牌阶段，若如此做，弃牌阶段结束时，你可以弃置一张手牌，获得一个额外的回合';
+    lib.skill.xietianzi={
+        forced:true,
+        popup:false,
+        filter:function(event,player){
+            return player.countCards('h')>0;
+        },
+        trigger:{
+            player:'phaseDiscardAfter',
+        },
+				content:function(){
+					"step 0"
+					player.removeSkill('xietianzi');
+						player.chooseToDiscard('h','是否弃置一张手牌并获得一个额外回合？').set('ai',function(card){
+							return 10-get.value(card);
+						});
+					"step 1"
+					if(result.bool){
+						player.insertPhase();
+					}
+				},
+    };
+    lib.card.xietianzi={
+				fullskin:true,
+				type:'trick',
+				enable:function(card,player,event){
+					if(get.mode()=='guozhan'&&!player.isMajor()) return false;
+					if(player.hasSkill('xietianzi')) return false;
+					if(_status.currentPhase!=player) return false;
+					return (event||_status.event).getParent().name=='phaseUse';
+				},
+				filterTarget:function(card,player,target){
+					return player==target;
+				},
+				selectTarget:-1,
+				content:function(){
+					var evt=_status.event.getParent('phaseUse');
+					if(evt&&evt.name=='phaseUse'){
+						evt.skipped=true;
+					}
+					target.addTempSkill('xietianzi');
+				},
+				
+				ai:{
+					order:0.5,
+					value:4,
+					useful:2,
+					result:{
+						target:function(player,target){
+							if(target.countCards('h')>=2) return 1;
+							return 0;
+						}
+					}
+				}
+			};
+			//调虎离山
+			lib.translate.diaohulishan_info='出牌阶段，对至多两名其他角色使用。目标角色于此回合结束之前不计入距离的计算且不能使用牌且不是牌的合法目标且不能失去或回复体力或受到伤害。';
+    lib.skill.g_diaohulishan={};
+    lib.skill.diaohulishan={
+        trigger:{player:['damageBefore','loseHpBefore','recoverBefore']},
+        forced:true,
+        popup:false,
+        content:function(){
+            trigger.cancel();
+        },
+				mod:{
+                    
+					cardEnabled:function(){
+						return false;
+					},
+					cardSavable:function(){
+						return false;
+					},
+					targetEnabled:function(){
+						return false;
+					},
+				},
+				mark:true,
+				intro:{
+					content:'不计入距离的计算且不能使用牌且不是牌的合法目标且不能失去/回复体力和受到伤害'
+				},
+				group:'undist'
+    }
+        }
+        //合纵
+        if(config.hezong){
+            lib.translate._lianheng='合纵';
+            lib.translate.lianheng_tag='合';
+            lib.skill._lianheng={
+				mode:['guozhan'],
+				enable:'phaseUse',
+                usable:1,
+				prompt:'将至多三张可合纵的牌交给一名与你势力不同的角色，或未确定势力的角色，若你交给与你势力不同的角色，则你摸等量的牌',
+				filter:function(event,player){
+					return (player.getCards('h',function(card){
+						return card.hasTag('lianheng');
+					}).length);
+				},
+				filterCard:function(card){
+					return card.hasTag('lianheng');
+				},
+				filterTarget:function(card,player,target){
+					if(target==player) return false;
+					if(player.isUnseen()) return target.isUnseen();
+					if(player.identity=='ye') return true;
+					return target.identity!=player.identity;
+				},
+                selectCard:[1,3],
+				prepare:'give',
+				discard:false,
+				// delay:0.5,
+				content:function(){
+					"step 0"
+					target.gain(cards,player);
+					"step 1"
+					if(!target.isUnseen()){
+						player.draw(cards.length);
+					}
+				},
+				ai:{
+					basic:{
+						order:2
+					},
+					result:{
+						player:function(player,target){
+							if(target.isUnseen()) return 0;
+							if(player.isMajor()) return 0;
+							return 0.5;
+						},
+						target:function(player,target){
+							if(target.isUnseen()) return 0;
+							return 1;
+						}
+					},
+				}
+			}
+        }
+        //新版君主规则
+        if(config.newjunzhu){
+            lib.config.mode_config.guozhan.junzhu=false;
+    lib.skill._mingzhi3={
+        trigger:{
+            player:"phaseBeginStart",
+        },
+        priority:22,
+        forced:true,
+        popup:false,
+        filter:function (event,player){
+            return !player.storage._mingzhi3&&player.isUnseen(0)&&lib.junList.contains(player.name1.slice(3));
+        },
+        content:function (){
+            'step 0'
+            player.storage._mingzhi3=true;
+            player.chooseBool('是否将主武将牌替换为君主？').ai=function(){
+                return true;
+            };
+            'step 1'
+            if(result.bool){
+                var from=player.name1;
+                var to='gz_jun_'+player.name1.slice(3);
+                event.maxHp=player.maxHp;
+                player.reinit(from,to,4);
+                player.showCharacter(0);
+            }
+            else event.finish();
+            'step 2'
+            if(player.maxHp>event.maxHp) player.recover(player.maxHp-event.maxHp);
+        },
+    }
+        }
+        //新版切换副将规则
+        if(config.newchangevice){
+            lib.element.content.mayChangeVice=function(){
+					'step 0'
+					player.chooseBool('是否变更副将？').set('ai',function(){
+						return get.rank(_status.event.player.name2,true)<=5;
+					});
+					'step 1'
+					if(result.bool){
+                        _status.changedSkills.add(event.skill)
+						player.changeVice();
+					}
+				}
+    lib.element.player.mayChangeVice=function(){
+        if(!_status.changedSkills) _status.changedSkills=[];
+        var skill=_status.event.name;
+	    if(this.hasViceCharacter()&&!_status.changedSkills.contains(skill)){
+			var next=game.createEvent('mayChangeVice');
+			next.setContent('mayChangeVice');
+		    next.player=this;
+            next.skill=skill;
+			return next;
+		}
+	}
+        }
         game.showAozhanInfo=function(){
 			var func=function(){
 				var dialog=ui.create.dialog('hidden');
@@ -281,7 +616,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         }
         if(config.weilose==false){
             //郭嘉荀彧曹丕徐晃魏延
-            lib.characterPack.mode_guozhan.gz_guojia=['male','wei',3,['tiandu','new_yiji']]
+            //lib.characterPack.mode_guozhan.gz_guojia=['male','wei',3,['tiandu','new_yiji']]
             lib.characterPack.mode_guozhan.gz_xunyu=['male','wei',3,['quhu','new_jieming']]
             lib.characterPack.mode_guozhan.gz_caopi=['male','wei',3,['xingshang','new_fangzhu']]
             lib.characterPack.mode_guozhan.gz_xuhuang=['male','wei',4,['new_duanliang'],[]]
@@ -360,8 +695,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
 		}
     }
 },precontent:function (){
-    
-},help:{},config:{"weilose":{"init":false,"name":"保留OL的未修改武将","intro":"若开启此选项，郭嘉、荀彧、曹丕、徐晃、魏延将不会改为2019新国战实体卡中的版本。"},"viewnext":{"init":false,"name":"启用观看下家副将","intro":"若开启此选项，所有的玩家将在挑选武将后，分发起始手牌之前，分别观看自己下家的副将。"},"marksystem":{"init":true,"name":"启用标记系统","intro":"若开启此选项，首亮奖励，珠联璧合奖励，半血补偿等将改为获得对应的标记。具体的标记规则，请查阅2019新国战的其他相关说明。"},"yedraw":{"init":true,"name":"启用野心家摸牌","intro":"若开启此选项，则当野心家杀死一名角色时，其始终改为摸三张牌。"},"aozhan":{"init":true,"name":"启用鏖战模式","intro":"若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。"},"aozhanbgm":{"init":"default","name":"鏖战模式音乐","item":{"default":"Online","chaoming":"潮鳴り","disabled":"不启用"},"intro":"鏖战模式下的背景音乐"},"mobilecharacter":{"init":false,"name":"引入移动版武将","intro":"若开启此选项，将在国战将池内引入移动版国战的专属武将【凌操】和【李丰】。"},"enablehimiko":{"init":false,"name":"启用卑弥呼","intro":"若开启此选项，将在国战将池内引入日文版的专属武将【卑弥呼】。"},"replacefazheng":{"init":true,"name":"替换法正","intro":"若开启此选项，且同时安装了【权·酱拌面】这一扩展的话，法正的〖眩惑〗中对应的所有技能将会改为新国战中对应的技能。"}},package:{
+},help:{},config:{"weilose":{"init":false,"name":"保留OL的未修改武将","intro":"若开启此选项，郭嘉、荀彧、曹丕、徐晃、魏延将不会改为2019新国战实体卡中的版本。"},"viewnext":{"init":false,"name":"启用观看下家副将","intro":"若开启此选项，所有的玩家将在挑选武将后，分发起始手牌之前，分别观看自己下家的副将。"},"marksystem":{"init":true,"name":"启用标记系统","intro":"若开启此选项，首亮奖励，珠联璧合奖励，半血补偿等将改为获得对应的标记。具体的标记规则，请查阅2019新国战的其他相关说明。"},"yedraw":{"init":true,"name":"启用野心家摸牌","intro":"若开启此选项，则当野心家杀死一名角色时，其始终改为摸三张牌。"},"aozhan":{"init":true,"name":"启用鏖战模式","intro":"若开启此选项，则将在游戏中引入“鏖战模式”的规则：<br>当游戏中仅剩四名或更少角色时（七人以下游戏时改为三名或更少），若此时全场没有超过一名势力相同的角色，则从一个新的回合开始，游戏进入鏖战模式直至游戏结束。<br>◇在鏖战模式下，【桃】只能当做【杀】或【闪】使用或打出，不能用来回复体力。<br>注：进入鏖战模式后，即使之后有两名或者更多势力相同的角色出现，仍然不会取消鏖战模式。"},"aozhanbgm":{"init":"default","name":"鏖战模式音乐","item":{"default":"Online","chaoming":"潮鳴り","disabled":"不启用"},"intro":"鏖战模式下的背景音乐"},"newjunzhu":{"init":true,"name":"启用新版君主规则","intro":"若开启此选项，君主武将牌将不会出现在玩家的选将框中。玩家的第一个回合开始时，若其主武将牌有对应的君主武将牌，则其可以将此武将牌替换为对应的君主武将牌，然后重新调整体力上限。若玩家的体力上限因此增大，则玩家回复等量的体力。"},"newchangevice":{"init":true,"name":"启用新版变更副将规则","intro":"若开启此选项，每个技能的变更副将的效果只能发动一次。"},"hezong":{"init":true,"name":"启用合纵规则","intro":"若开启此选项，「连横」规则将改为「合纵」规则（出牌阶段限一次，你可以将至多三张可合纵的牌交给一名与你势力不同的角色，或未确定势力的角色，若你交给与你势力不同的角色，则你摸等量的牌）。"},"newcard":{"init":true,"name":"启用新版势备卡牌","intro":"若开启此选项，所有在2019版新势备篇中修改的卡牌（六龙骖驾除外）将替换为对应的修改版本。"},"mobilecharacter":{"init":false,"name":"引入移动版武将","intro":"若开启此选项，将在国战将池内引入移动版国战的专属武将【凌操】和【李丰】。"},"enablehimiko":{"init":false,"name":"启用卑弥呼","intro":"若开启此选项，将在国战将池内引入日文版的专属武将【卑弥呼】。"},"replacefazheng":{"init":true,"name":"替换法正","intro":"若开启此选项，且同时安装了【权·酱拌面】这一扩展的话，法正的〖眩惑〗中对应的所有技能将会改为新国战中对应的技能。"}},package:{
     character:{
         character:{
         },
@@ -2593,5 +2927,5 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
     author:"苏婆玛丽奥",
     diskURL:"",
     forumURL:"",
-    version:"3.2",
+    version:"3.4",
 },files:{"character":[],"card":[],"skill":[]}}})
