@@ -11,7 +11,7 @@ extension["新服杂碎"]={
 		"pangdegong.jpg","re_jsp_pangtong.jpg","re_zhangliang.jpg","lvdai.jpg","caoying.jpg",
 		"duji.jpg","zhangqiying.jpg","fanchou.jpg","lvkai.jpg","guosi.jpg","lijue.jpg","xurong.jpg",
 		"simahui.jpg","shuijing_card.jpg","simazhao.jpg","wangyuanji.jpg","xf_huangquan.jpg",
-		"xf_tangzi.jpg","xf_sufei.jpg"],
+		"xf_tangzi.jpg","xf_sufei.jpg","sp_xiahoushi.jpg"],
 	size:"6.76MB"
 };
 extension["新国战"]={
