@@ -42,6 +42,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
             xf_huangquan:"道绝殊途",
             xf_sufei:"与子同袍",
             xf_tangzi:"工学之奇才",
+            sp_xiahoushi:"疾冲之恋",
         };
         for(var i in CT){
             lib.characterTitle[i]=CT[i];
@@ -67,6 +68,10 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
     };
     if(!_status.angelbeats) _status.angelbeats={};
     lib.extensionMenu.extension_新服杂碎.cheatcode.onclick=function(){
+        if(lib.device!='android'){
+           alert('神秘代码功能仅限在安卓端使用...');
+        }
+        else{
         var code=window.prompt('神秘代码');
         if(['夏洛特一生推'].contains(code)){
             var num=window.prompt('【神秘代码】已经成功开启「Charlotte」模式。请输入一个1到6之间的整数。');
@@ -84,6 +89,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
             num=parseInt(num);
             if([1,2,3].contains(num)) _status.angelbeats.againstGod=num;
             else _status.angelbeats.againstGod=3;
+        }
         }
     };
     //阵亡配音
@@ -1416,6 +1422,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
             baosanniang:["female","shu",3,["xinfu_wuniang","xinfu_xushen"],["des:鲍三娘是中国民间传说中的人物，事迹多见于《花关索传》。相传她是鲍家庄鲍员外的小女儿。后来与关索成亲，关羽自传授其武艺，因此也造就了鲍三娘的文武双全。荆州失守之后鲍三娘就跟随关索一同投奔蜀汉，并随诸葛亮征讨南蛮。平定了南蛮之后，夫妻二人就此一直替诸葛亮镇守着南中，他们也的确留下了许多脍炙人口的行侠仗义故事，在民间广为流传。"]],
             xurong:["male","qun",4,["xinfu_xionghuo","xinfu_shajue"],["des:徐荣（？－192年），玄菟人（一说为辽东襄平人，《公孙度传》中说公孙度本辽东襄平人，迁居玄菟，为同郡徐荣所举，任辽东太守。同郡当是同“玄菟”郡），东汉末年将领。本为中郎将，曾向董卓推举同郡出身的公孙度出任辽东太守。于汴水之战中击败曹操的独立追击军，以及在梁东之战中击败孙坚的部队。在董卓死后，受司徒王允的命令与李傕、郭汜交战，因部将胡珍投降，寡不敌众，于新丰之战被击败，战死在乱军之中。"]],
             zhangqiying:["female","qun",3,["xinfu_falu","xinfu_dianhua","xinfu_zhenyi"],["des:张琪瑛（196年－217年），字不详（或琪瑛为字，名不详），祖籍沛国丰县（今江苏省丰县）。她的曾祖父张陵是西汉留侯张良的十一世孙、天师道（五斗米道）教祖，她的父亲是东汉末年割据汉中的军阀张鲁。张琪瑛继承家说，是五斗米教的传人。"]],
+            "sp_xiahoushi":["female","shu",3,["xinfu_yanyu","xinfu_xiaode"],[]],
             },
   	    	characterIntro:{
     		},
@@ -2766,6 +2773,143 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         }
     },
             },
+            "xinfu_yanyu":{
+                trigger:{
+                    global:"phaseUseBegin",
+                },
+                direct:true,
+                filter:function (event,player){
+        return player.countCards('he')>0;
+    },
+                content:function (){
+        'step 0'
+        player.chooseToDiscard(get.prompt('xinfu_yanyu'),get.translation('xinfu_yanyu_info'),'he').set('ai',function(card){
+            return 5-get.value(card);
+        }).set('logSkill','xinfu_yanyu');
+        'step 1'
+        if(result.bool){
+            player.storage.xinfu_yanyu=get.type(result.cards[0],'trick');
+            player.addTempSkill('xinfu_yanyu2','phaseUseAfter');
+        }
+    },
+            },
+            "xinfu_yanyu2":{
+                init:function (player,skill){
+        player.storage[skill]=0;
+    },
+                onremove:function (player,skill){
+        delete player.storage.xinfu_yanyu;
+        delete player.storage.xinfu_yanyu2;
+    },
+                trigger:{
+                    global:"loseEnd",
+                },
+                direct:true,
+                filter:function (event,player){
+        if(player.storage.xinfu_yanyu2>=3) return false;
+        var evt=event.getParent();
+        if(evt&&evt.name=='useCard'&&evt.card&&['equip','delay'].contains(get.type(evt.card))) return false;
+        var type=player.storage.xinfu_yanyu;
+        var cards=event.cards;
+        for(var i=0;i<cards.length;i++){
+            if(get.type(cards[i],'trick')==type&&get.position(cards[i])=='d') return true;
+        }
+        return false;
+    },
+                content:function (){
+        'step 0'
+        event.logged=false;
+        event.cards=[];
+        var type=player.storage.xinfu_yanyu;
+        var cards=trigger.cards;
+        for(var i=0;i<cards.length;i++){
+            if(get.type(cards[i],'trick')==type&&get.position(cards[i])=='d') event.cards.push(cards[i]);
+        }
+        'step 1'
+        if(player.storage.xinfu_yanyu2>=3) event.finish();
+        else player.chooseCardButton(event.cards,'【燕语】：是否将其中的一张牌交给一名角色？').ai=function(card){
+            if(card.name=='du') return 10;
+            return get.value(card);
+        };
+        'step 2'
+        if(result.bool){
+            player.storage.xinfu_yanyu2++;
+            if(!event.logged){
+                player.logSkill('xinfu_yanyu');
+                event.logged=true;
+            }
+            event.togain=result.links[0];
+            event.cards.remove(event.togain);
+            player.chooseTarget(true,'请选择要获得'+get.translation(event.togain)+'的角色').set('ai',function(target){
+                var att=get.attitude(_status.event.player,target);
+                if(_status.event.du) return -att;
+                return att;
+            }).set('du',event.togain.name=='du');
+        }
+        else event.finish();
+        'step 3'
+        var target=result.targets[0];
+        player.line(target,'green');
+        target.gain(event.togain,'gain2');
+        if(event.cards.length) event.goto(1);
+    },
+            },
+            "xinfu_xiaode":{
+                subSkill:{
+                    remove:{
+                        unique:true,
+                        charlotte:true,
+                        trigger:{
+                            player:"phaseAfter",
+                        },
+                        forced:true,
+                        popup:false,
+                        content:function (){
+                player.removeAdditionalSkill('xinfu_xiaode');
+                player.removeSkill('xinfu_xiaode_remove');
+            },
+                    },
+                },
+                trigger:{
+                    global:"dieAfter",
+                },
+                direct:true,
+                filter:function (skill,event){
+        return !event.hasSkill('xinfu_xiaode_remove');
+    },
+                content:function (){
+        'step 0'
+        var list=[];
+        var listm=[];
+        var listv=[];
+        if(trigger.player.name1!=undefined) listm=lib.character[trigger.player.name1][3];
+        else listm=lib.character[trigger.player.name][3];
+        if(trigger.player.name2!=undefined) listv=lib.character[trigger.player.name2][3];
+        listm=listm.concat(listv);
+        var func=function(skill){
+            var info=get.info(skill);
+            if(info.charlotte||info.zhuSkill||(info.unique&&!info.limited)) return false;
+            return true;
+        };
+        for(var i=0;i<listm.length;i++){
+            if(func(listm[i])) list.add(listm[i]);
+        }
+        if(list.length){
+            player.chooseControl(list,'cancel2').set('prompt',get.prompt('xinfu_xiaode')).set('prompt2',get.translation('xinfu_xiaode_info')).set('ai',function(){
+                return list.randomGet();
+            });
+        }
+        else event.finish();
+        'step 1'
+        if(result.control&&result.control!='cancel2'){
+            player.logSkill('xinfu_xiaode');
+            player.popup(result.control,'thunder');
+            game.log(player,'获得了技能','#g【'+get.translation(result.control)+'】');
+            player.addAdditionalSkill('xinfu_xiaode',[result.control]);
+            player.addSkill('xinfu_xiaode_remove');
+        }
+    },
+            },
             },
             translate:{
             caoying:"曹婴",
@@ -2831,6 +2975,13 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
             "zhenyi_club_info":"",
             "zhenyi_heart":"真仪",
             "zhenyi_heart_info":"",
+            "sp_xiahoushi":"sp夏侯氏",
+            "xinfu_yanyu":"燕语",
+            "xinfu_yanyu_info":"任意一名角色的出牌阶段开始时，你可以弃置一张牌。若如此做，则该出牌阶段内，每当有角色失去了与你弃置的牌类别相同的其他牌且进入弃牌堆时，你可令任意一名角色获得此牌。每阶段以此法获得的牌不能超过三张。",
+            "xinfu_yanyu2":"燕语",
+            "xinfu_yanyu2_info":"",
+            "xinfu_xiaode":"孝德",
+            "xinfu_xiaode_info":"每当有其他角色阵亡后，你可以声明该武将牌的一项技能。若如此做，你获得此技能且不能再发动〖孝德〗直到你的回合结束。(你不能声明觉醒技或主公技)",
             },
         };
         if(lib.device||lib.node){
@@ -6828,15 +6979,9 @@ return mobilesupport;
         translate:{
         },
     },
-    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.06.01",
+    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.06.05",
     author:"苏婆玛丽奥",
     diskURL:"",
     forumURL:"",
-    version:"2.8",
-},files:{"character":["xf_yiji.jpg","majun.jpg","lvqian.jpg","zhangji.jpg","zhanggong.jpg",
-		"panjun.jpg","liuyan.jpg","weiwenzhugezhi.jpg","yanjun.jpg","wangcan.jpg","zhoufang.jpg",
-		"wolong_card.jpg","baosanniang.jpg","fengchu_card.jpg","re_yuji.jpg","zhaotongzhaoguang.jpg",
-		"sp_taishici.jpg","xuanjian_card.jpg","liuyao.jpg","pangdegong.jpg","re_jsp_pangtong.jpg",
-		"re_zhangliang.jpg","lvdai.jpg","caoying.jpg","duji.jpg","zhangqiying.jpg","fanchou.jpg",
-		"lvkai.jpg","guosi.jpg","lijue.jpg","xurong.jpg","simahui.jpg","shuijing_card.jpg",
-		"simazhao.jpg","wangyuanji.jpg","xf_huangquan.jpg","xf_tangzi.jpg","xf_sufei.jpg"],"card":[],"skill":[]}}})
+    version:"2.9",
+},files:{"character":["sp_xiahoushi.jpg"],"card":[],"skill":[]}}})
