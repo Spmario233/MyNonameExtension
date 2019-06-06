@@ -1510,10 +1510,10 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         player.popup('猜对'+get.cnNumber(event.num)+'项');
         game.log(player,'猜对了'+get.cnNumber(event.num)+'项');
         if(event.num>0){
-            player.addTempSkill('lingren_adddamage','useCardAfter');
-            player.storage.lingren={
-                name:trigger.card.name,
-                player:event.targett,
+            event.targett.addTempSkill('lingren_adddamage');
+            event.targett.storage.lingren={
+                card:trigger.card,
+                //player:event.targett,
             }
         }
         if(event.num>1) player.draw(2);
@@ -1523,7 +1523,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         }
     },
                 ai:{
-                    threaten:1.4,
+                    threaten:2.4,
                 },
             },
             "lingren_adddamage":{
@@ -1531,18 +1531,17 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         delete player.storage.lingren;
     },
                 trigger:{
-                    source:"damageBegin",
+                    player:"damageBegin",
                 },
                 filter:function (event,player){
         var info=player.storage.lingren;
-        if(event.player!=info.player) return false;
-        return event.card&&event.card.name==info.name&&event.notLink();
+        return event.card&&event.card==info.card;
     },
                 silent:true,
                 popup:false,
                 forced:true,
                 content:function (){
-        trigger.num++;
+            trigger.num++;
     },
             },
             "lingren_jianxiong":{
@@ -4532,6 +4531,10 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
             if(get.mode()=='guozhan'){
                 list=list.concat(['xietianzi','shuiyanqijunx','lulitongxin','lianjunshengyan','chiling','diaohulishan','yuanjiao','huoshaolianying']);
             }
+            if(lib.card.xinfu_nvzhuang!=undefined&&get.mode!='guozhan'){
+                list=list.concat(["xinfu_xiejiaguitian","xinfu_shushangkaihua",
+		"xinfu_zhuluzhongyuan"]);
+            }
             for(var i=0;i<list.length;i++){
                 if(i<3){
                     list[i]=['基本','',list[i]];
@@ -4556,7 +4559,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
             var player=_status.event.player;
             var players=game.filterPlayer();
             var hasEnemy=game.hasPlayer(function(current){
-                return current!=player&&!current.hasSkill('chanyuan');
+                return current!=player&&!current.hasSkill('chanyuan')&&get.attitude(player,current)<=0;
             })?true:false;
             var num=0;
             if(name=='wuzhong'){
@@ -4612,7 +4615,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
                 selectCard:1,
                 check:function(card){
                     if(card.name==_status.guhuo_name) return 7;
-                    else return 6-get.value(card);
+                    else return 5.5-get.value(card);
                 },
                 viewAs:{name:links[0][2],nature:links[0][3]},
             }
@@ -4622,9 +4625,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         },
                 },
                 ai:{
-                    order:function (){
-            return [6,8,10].randomGet();
-        },
+                    order:10,
                     result:{
                         player:1,
                     },
@@ -4655,6 +4656,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         event.guessers=game.filterPlayer(function(current){
             return current!=player&&!current.hasSkill('chanyuan');
         });
+        event.guessers.sort(lib.sort.seat);
         'step 1'
         if(event.guessers.length==0) event.finish();
         else{
@@ -4691,6 +4693,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
     },
             },
             chanyuan:{
+                charlotte:true,
                 trigger:{
                     player:["phaseBefore","changeHp"],
                 },
@@ -4768,10 +4771,11 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
         player.chooseCard('是否发动【蛊惑】，将一张手牌当做'+get.translation(event.name)+'打出？').set('ai',function(card){
             var player=_status.event.player;
             var hasEnemy=game.hasPlayer(function(current){
-                return current!=player&&!current.hasSkill('chanyuan');
+                return current!=player&&!current.hasSkill('chanyuan')&&get.attitude(player,current)<=0;
             })?true:false;
             if(hasEnemy){
-                return card.name==_status.event.name?7:(3-get.value(card));
+                if(card.name==_status.event.name) return 7;
+                return 3-get.value(card);
             };
             return 5-get.value(card);
         }).set('name',event.name);
@@ -4785,6 +4789,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
             event.guessers=game.filterPlayer(function(current){
                 return current!=player&&!current.hasSkill('chanyuan');
             });
+            event.guessers.sort(lib.sort.seat);
         }else event.finish();
         "step 2"
         if(event.guessers.length==0) event.goto(5);
@@ -4843,18 +4848,19 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
                 },
                 prompt:"将一张手牌当无懈可击使用",
                 check:function (card){
-                    var player=_status.event.player;
-                    var hasEnemy=game.hasPlayer(function(current){
-                return current!=player&&!current.hasSkill('chanyuan');
-            })?true:false;
-                    if(hasEnemy){
-                        return card.name=='wuxie'?7:0;
-                    };
-                    return 6-get.value(card)
+                   // var player=_status.event.player;
+                 //   var hasEnemy=game.hasPlayer(function(current){
+              //  return current!=player&&!current.hasSkill('chanyuan')&&get.attitude(player,current)<=0;
+         //   })?true:false;
+                 //   if(hasEnemy==true){
+                        if(card.name!='wuxie') return -1;
+                        return 7;
+                   // }
+                  //  return 5-get.value(card);
                 },
                 threaten:1.2,
                 ai:{
-                    order:-1,
+                    //order:-1,
                     basic:{
                         useful:[6,4],
                         value:[6,4],
@@ -4864,7 +4870,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"新�
                     },
                     expose:0.2,
                 },
-                forced:true,
+                //forced:true,
             },
             "guhuo_phase":{
             },
@@ -5242,9 +5248,13 @@ game.import('character',function(){
             "yizan_respond_sha":{
                 audio:"ext:新服杂碎:2",
                 enable:["chooseToRespond"],
-                filterCard:function (card){
-        if(ui.selected.cards.length) return true;
-        return get.type(card)=='basic';
+                filterCard:function (card,player,target){
+            if(player.storage.yizan) return get.type(card)=='basic';
+            else if(ui.selected.cards.length){
+            if(get.type(ui.selected.cards[0])=='basic') return true;
+            return get.type(card)=='basic';
+        }
+        return true;
     },
                 selectCard:function (){
         var player=_status.event.player;
@@ -5255,6 +5265,7 @@ game.import('character',function(){
                 viewAs:{
                     name:"sha",
                 },
+                complexCard:true,
                 viewAsFilter:function (player){
         if(!player.storage.yizan){
             if(player.countCards('h')<2) return false;
@@ -5269,7 +5280,7 @@ game.import('character',function(){
         return '将'+str+'当做杀打出';
     },
                 check:function (card){
-                    if(!ui.selected.cards.length) return 6;
+                    if(!ui.selected.cards.length&&get.type(card)=='basic') return 6;
                     return 5-get.value(card);
     },
                 ai:{
@@ -5287,8 +5298,8 @@ game.import('character',function(){
                         value:[5,1],
                     },
                     order:function (){
-            if(_status.event.player.hasSkillTag('presha',true,null,true)) return 10;
-            return 3;
+            if(_status.event.player.hasSkillTag('presha',true,null,true)) return 10.1;
+            return 3.1;
         },
                     result:{
                         target:function (player,target){
@@ -5384,18 +5395,23 @@ game.import('character',function(){
         },
                     backup:function (links,player){
             return {
-                filterCard:function(card){
-                    if(ui.selected.cards.length) return true;
-                    return get.type(card)=='basic';
+                filterCard:function(card,player,target){
+                   if(player.storage.yizan) return get.type(card)=='basic';
+            else if(ui.selected.cards.length){
+            if(get.type(ui.selected.cards[0])=='basic') return true;
+            return get.type(card)=='basic';
+        }
+        return true;
                 },
+                complexCard:true,
                 selectCard:function(){
                     var player=_status.event.player;
                     if(player.storage.yizan) return 1;
                     return 2;
                 },
                 check:function(card,player,target){
-                    if(!ui.selected.cards.length) return 6;
-                   else return 5-get.value(card);
+                    if(!ui.selected.cards.length&&get.type(card)=='basic') return 6;
+                    else return 6-get.value(card);
                 },
                 viewAs:{name:links[0][2],nature:links[0][3]},
                 position:'he',
@@ -5415,9 +5431,9 @@ game.import('character',function(){
             var player=_status.event.player;
             var event=_status.event;
             if(event.filterCard({name:'jiu'},player,event)&&get.effect(player,{name:'jiu'})>0&&player.storage.yizan&&player.countCards('h',{type:'basic'})>2){
-                return 3.1;
+                return 3.3;
             }
-            return 2.9;
+            return 3.1;
         },
                     save:true,
                     respondSha:true,
@@ -5440,12 +5456,17 @@ game.import('character',function(){
                 },
             },
             "yizan_respond_shan":{
+                complexCard:true,
                 audio:"ext:新服杂碎:2",
                 enable:["chooseToRespond"],
-                filterCard:function (card){
-        if(ui.selected.cards.length) return true;
-        return get.type(card)=='basic';
-    },
+                filterCard:function (card,player,target){
+        if(player.storage.yizan) return get.type(card)=='basic';
+            else if(ui.selected.cards.length){
+            if(get.type(ui.selected.cards[0])=='basic') return true;
+            return get.type(card)=='basic';
+        }
+        return true;
+        },
                 selectCard:function (){
         var player=_status.event.player;
         if(player.storage.yizan) return 1;
@@ -5469,7 +5490,7 @@ game.import('character',function(){
         return '将'+str+'当做闪打出';
     },
                 check:function (card){
-                    if(!ui.selected.cards.length) return 6;
+                    if(!ui.selected.cards.length&&get.type(card)=='basic') return 6;
                     return 5-get.value(card);
                 },
                 ai:{
@@ -6979,9 +7000,9 @@ return mobilesupport;
         translate:{
         },
     },
-    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.06.05",
+    intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.06.06",
     author:"苏婆玛丽奥",
     diskURL:"",
     forumURL:"",
-    version:"2.9",
+    version:"2.10",
 },files:{"character":["sp_xiahoushi.jpg"],"card":[],"skill":[]}}})
