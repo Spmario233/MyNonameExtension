@@ -1,9 +1,9 @@
 extension["新服杂碎"]={
-	intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.06.05",
+	intro:"关于但不限于新服的各种玩意儿<br>更新日期：2019.06.06",
 	author:"苏婆玛丽奥",
 	netdisk:"",
 	forum:"",
-	version:"2.9",
+	version:"2.10",
 	files:["xf_yiji.jpg","extension.js","liuyao.jpg","majun.jpg","lvqian.jpg","zhangji.jpg",
 		"zhanggong.jpg","panjun.jpg","liuyan.jpg","weiwenzhugezhi.jpg","yanjun.jpg","wangcan.jpg",
 		"zhoufang.jpg","wolong_card.jpg","baosanniang.jpg","fengchu_card.jpg","re_yuji.jpg",
